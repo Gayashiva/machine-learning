@@ -69,20 +69,36 @@ for j=1:m
 Y(y(j),j)=1;
 end
 
+
+
 a1=[ones(m, 1) X];
-z1=a1*Theta1';
-a2=sigmoid(z1);
+z2=a1*Theta1';
+a2=sigmoid(z2);
 a2 = [ones(size(a2,1), 1) a2];
-z2=a2*Theta2';
-a3=sigmoid(z2);
+z3=a2*Theta2';
+a3=sigmoid(z3);
 HthetaX=a3;
 Theta1NoBias=Theta1(:,2:end);
 Theta2NoBias=Theta2(:,2:end);
 
 J=sum(sum(-Y' .* log(HthetaX)-(1-Y').* log(1-HthetaX)))/m+(lambda/(2*m))*(sum(sum(Theta1NoBias.^2))+sum(sum(Theta2NoBias.^2)));
+delta1=zeros(size(Theta1));
+delta2=zeros(size(Theta2));
+ for t=1:m
+  for k=1:num_labels
+    yk=y(t)==k;
+    delta_3(k)=a3(t,k)-yk;
+    end
+    delta_2=Theta2' *delta_3' .*sigmoidGradient([1,z2(t,:)])';
+    delta1=delta1 + delta_2(2:end)*a1(t,:);
+    delta2=delta2+delta_3'*a2(t,:);
 
+  end
+Theta1Zero=[zeros(size(Theta1,1),1) Theta1NoBias];
+Theta2Zero=[zeros(size(Theta2,1),1) Theta2NoBias];
 
-
+Theta1_grad=(1/m)*delta1+(lambda/m) * Theta1Zero;
+Theta2_grad=1/m*delta2+lambda/m * Theta2Zero;
 
 
 
